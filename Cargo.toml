@@ -3,24 +3,23 @@ name = "server"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-sqlx = { version = "0.8", features = [
-    "runtime-tokio",
-    "tls-rustls",
-    "postgres",
-    "chrono",
-    "json",
-    "uuid",
-    "bigdecimal",
-    "derive",
-    "macros",
-] }
-ntex = { version = "2", features = ["tokio"] }
-reqwest = { version = "0.12", features = ["json"] }
-
 [build]
 rustflags = ["-Z", "threads=8"]
 
 [profile.dev.build-override]
 opt-level = 3
-incremental = false
+
+
+[dependencies]
+tokio = { version = "1.39.3", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+dotenv = "0.15"
+axum = "0.7.5"
+serde_json = "1.0"
+
+# cornucopia
+cornucopia_async = "0.6.0"
+futures = "0.3.30"
+deadpool-postgres = "0.14.0"
+tokio-postgres = "0.7.11"
+postgres-types = { version = "0.2.7", features = ["derive"] }

@@ -1,1 +1,5 @@
 /target
+/resources
+
+.vscode/
+.env
