@@ -1,11 +1,15 @@
 pub mod api;
 pub mod database;
 
+use std::string;
+
 use crate::api::connection::establish_connection;
 use crate::database::models::*;
 use diesel::prelude::*;
 use reqwest::{self, header::HeaderValue};
 use serde_json::{json, Value};
+
+use crate::api::character::{create_chracter, get_character};
 // use std::env;
 // use tokio::net::TcpListener;
 
@@ -40,13 +44,33 @@ async fn fetch_profile(Path(name): Path<String>) -> Json<Value> {
     }
 }
 
+async fn create_test_char(conn: &mut PgConnection, name: &str) -> Json<Value> {
+    let character = get_character(conn, name);
+
+    match character {
+        Ok(_) => {
+            return Json(json!({"message": "Character already exists"}));
+        }
+        Err(_) => {
+            create_chracter(conn, name);
+            return Json(json!({"message": "Character created"}));
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     //.route("/profile/:character_name", get(fetch_profile))
     use crate::database::schema::characters::dsl::*;
 
     // let app = Router::new();
+
+    // let profile = fetch_profile(Path("mowws".to_string())).await;
+    // println!("{:?}", profile);
+
     let connection = &mut establish_connection();
+    create_test_char(connection, "mowws").await;
+
     let results = characters
         .limit(5)
         .load::<Character>(connection)

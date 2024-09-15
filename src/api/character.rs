@@ -1,13 +1,13 @@
 use crate::database::models::{Character, NewCharacter};
 use diesel::prelude::*;
 
-pub fn get_character(conn: &mut PgConnection, name: &str) -> Character {
+pub fn get_character(
+    conn: &mut PgConnection,
+    name: &str,
+) -> Result<Character, diesel::result::Error> {
     use crate::database::schema::characters::dsl::*;
 
-    characters
-        .filter(character_name.eq(name))
-        .first(conn)
-        .expect("Error loading character")
+    characters.filter(character_name.eq(name)).first(conn)
 }
 
 pub fn create_chracter(conn: &mut PgConnection, name: &str) {
