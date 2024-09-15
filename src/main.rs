@@ -1,18 +1,19 @@
+pub mod api;
+pub mod database;
+
+use crate::api::connection::establish_connection;
+use crate::database::models::*;
+use diesel::prelude::*;
 // use reqwest::{self, header::HeaderValue};
 // use serde_json::{json, Value};
-use server::establish_connection;
-use server::models::*;
 // use std::env;
-use axum::Router;
-use diesel::prelude::*;
-use tokio::net::TcpListener;
+// use tokio::net::TcpListener;
 
 // use axum::{
-//     // extract::Path,
-//     // http::StatusCode,
-//     // routing::{get, post},
-//     // Json,
-//     Router,
+//     extract::Path,
+//     http::StatusCode,
+//     routing::{get, post},
+//     Json, Router,
 // };
 
 // const RUNEMETRICS_PROFILE_URL: &str =
@@ -42,7 +43,7 @@ use tokio::net::TcpListener;
 #[tokio::main]
 async fn main() {
     //.route("/profile/:character_name", get(fetch_profile))
-    use server::schema::characters::dsl::*;
+    use crate::database::schema::characters::dsl::*;
 
     // let app = Router::new();
     let connection = &mut establish_connection();
