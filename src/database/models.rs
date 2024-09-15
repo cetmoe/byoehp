@@ -13,7 +13,7 @@ pub struct Character {
 }
 
 #[derive(Insertable)]
-#[table_name = "characters"]
+#[diesel(table_name = characters)]
 pub struct NewCharacter<'a> {
     pub character_name: &'a str,
     pub user_id: Option<i32>,
