@@ -1,49 +1,58 @@
-use dotenv::dotenv;
-use reqwest::{self, header::HeaderValue};
-use serde_json::{json, Value};
-use std::env;
+// use reqwest::{self, header::HeaderValue};
+// use serde_json::{json, Value};
+use server::establish_connection;
+use server::models::*;
+// use std::env;
+use axum::Router;
+use diesel::prelude::*;
 use tokio::net::TcpListener;
 
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    routing::{get, post},
-    Json, Router,
-};
+// use axum::{
+//     // extract::Path,
+//     // http::StatusCode,
+//     // routing::{get, post},
+//     // Json,
+//     Router,
+// };
 
-const X: &str = "https://apps.runescape.com/runemetrics/profile/profile?user=mowws";
+// const RUNEMETRICS_PROFILE_URL: &str =
+//     "https://apps.runescape.com/runemetrics/profile/profile?user=mowws";
 
-async fn fetch_profile(Path(name): Path<String>) -> Json<Value> {
-    let url = format!(
-        "https://secure.runescape.com/m=hiscore_oldschool/index_lite.json?player={}",
-        name
-    );
+// async fn fetch_profile(Path(name): Path<String>) -> Json<Value> {
+//     let url = format!(
+//         "https://secure.runescape.com/m=hiscore_oldschool/index_lite.json?player={}",
+//         name
+//     );
 
-    match reqwest::get(url.clone()).await {
-        Ok(request) => {
-            if request.headers().get("content-type")
-                != Some(&HeaderValue::from_static("application/json"))
-            {
-                return Json(json!({"Error": 32, "hehe": url.clone()}));
-            }
+//     match reqwest::get(url.clone()).await {
+//         Ok(request) => {
+//             if request.headers().get("content-type")
+//                 != Some(&HeaderValue::from_static("application/json"))
+//             {
+//                 return Json(json!({"Error": 32, "hehe": url.clone()}));
+//             }
 
-            let body = request.json().await.unwrap();
-            Json(body)
-        }
-        Err(_) => Json(json!({"Error": 42})),
-    }
-}
+//             let body = request.json().await.unwrap();
+//             Json(body)
+//         }
+//         Err(_) => Json(json!({"Error": 42})),
+//     }
+// }
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
+    //.route("/profile/:character_name", get(fetch_profile))
+    use server::schema::characters::dsl::*;
 
-    const DB_KEY: &str = "pgsql_db";
-    let connection_string = env::var(DB_KEY)
-        .expect(format!("Database connection string not found. {}", DB_KEY).as_str());
+    // let app = Router::new();
+    let connection = &mut establish_connection();
+    let results = characters
+        .limit(5)
+        .load::<Character>(connection)
+        .expect("Error loading characters");
 
-    let app = Router::new().route("/profile/:character_name", get(fetch_profile));
+    println!("Displaying {} characters", results.len());
 
-    let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    // let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    // axum::serve(listener, app).await.unwrap();
 }
